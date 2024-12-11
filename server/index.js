@@ -1,11 +1,14 @@
 import express from 'express';
 import { config } from 'dotenv';
-
+import connectDb from './config/connectDatabase.js';
 // Load environment variables from .env file
 config({ path: './.env' });
 
 // Create an express app
 const app = express();
+// Connect to the database
+await connectDb();
+
 
 // Middleware to parse JSON (optional, but useful for future use)
 app.use(express.json());
