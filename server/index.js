@@ -4,7 +4,10 @@ import helmet from 'helmet';
 import connectDb from './config/connectDatabase.js';
 import cors from 'cors';
 import globalErrorHandler from './middleware/globalErrorHandler.js';
-import { Error } from 'mongoose';
+
+//  import routes 
+import userRoutes from './routes/userRoutes.js'
+
 
 // Load environment variables from .env file
 config({ path: './.env' });
@@ -42,13 +45,9 @@ app.use(express.json());
 
 
 // Routes 
-
-app.get('/',  (req, res, next) => {
-  const err = new Error();
-  err.message = 'server side error';
-  err.statusCode = 400;
-  return next(err);
-});
+//  useRoutes
+const base = "/api/v1"
+app.use(`${base}/user`,userRoutes)
 
 //  error handling middleware
 app.use(globalErrorHandler);
