@@ -4,30 +4,33 @@ import helmet from 'helmet';
 import connectDb from './config/connectDatabase.js';
 import cors from 'cors';
 import globalErrorHandler from './middleware/globalErrorHandler.js';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import fs from 'fs';
+
 
 //  import routes 
 import userRoutes from './routes/userRoutes.js'
 
-
 // Load environment variables from .env file
 config({ path: './.env' });
+
 
 // Create an express app
 const app = express();
 
-// Use helmet middleware to secure the app
-// all the configuration of the securirty 
-// we can create the object and pass into it 
+// create log stream  
+const logStream = fs.createWriteStream('access.log', { flags: 'a' });
+app.use(morgan('dev', { stream: logStream }));
+
 app.use(helmet());
 
-// Enable cors 
-/**
-Configure CORS middleware to allow cross-origin requests
-Enables all origins ('*') and allows GET, POST, PUT, DELETE methods
-This middleware handles preflight requests and sets appropriate CORS headers */
+app.use(cookieParser());
+
 app.use(cors({
   origin: '*',
 }))
+
 
 
 
@@ -37,10 +40,6 @@ app.use(cors({
 await connectDb();
 
 
-// Middleware to parse JSON (optional, but useful for future use)
-// It examines incoming requests with JSON payloads (Content-Type: application/json)
-// Automatically parses the JSON data
-// Places the parsed data in req.body for easy access
 app.use(express.json()); 
 
 
