@@ -1,0 +1,2 @@
+::1 - - [15/Dec/2024:07:27:47 +0000] "POST /api/v1/user/login HTTP/1.1" 200 310 "-" "PostmanRuntime/7.43.0"
+[0mPOST /api/v1/user/login [32m200[0m 120.239 ms - 310[0m
