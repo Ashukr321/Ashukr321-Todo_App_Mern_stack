@@ -148,6 +148,20 @@ const profileInfo= async(req,res,next)=>{
   }
 }
 
+const logout = async(req,res,next)=>{
+  try {
+    res.clearCookie("token");
+    res.status(200).json({
+      success:true,
+      message:"User logout successfully"
+    })
+    res.redirect('/login');
+  } catch (error) {
+    return next(error);
+  }
+}
+
+
 // Utility function to create errors
 function createError(message, statusCode) {
   const err = new Error(message);
@@ -155,4 +169,4 @@ function createError(message, statusCode) {
   return err;
 }
 
-export {createUser,loginUser,profileInfo}
+export {createUser,loginUser,profileInfo,logout}
