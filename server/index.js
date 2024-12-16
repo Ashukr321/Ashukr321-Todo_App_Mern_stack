@@ -7,7 +7,7 @@ import globalErrorHandler from './middleware/globalErrorHandler.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import fs from 'fs';
-
+import jwt from 'jsonwebtoken';
 
 //  import routes 
 import userRoutes from './routes/userRoutes.js'
@@ -20,8 +20,12 @@ config({ path: './.env' });
 const app = express();
 
 // create log stream  
-const logStream = fs.createWriteStream('access.log', { flags: 'a' });
+if(process.env.NODE_ENV=="production"){
+  const logStream = fs.createWriteStream('access.log', { flags: 'a' });
 app.use(morgan('dev', { stream: logStream }));
+}
+
+
 
 app.use(helmet());
 
@@ -29,6 +33,7 @@ app.use(cookieParser());
 
 app.use(cors({
   origin: '*',
+  credentials: true,
 }))
 
 
@@ -42,6 +47,9 @@ await connectDb();
 
 app.use(express.json()); 
 
+app.use(async(req,res,next)=>{
+ return next();
+})
 
 // Routes 
 //  useRoutes

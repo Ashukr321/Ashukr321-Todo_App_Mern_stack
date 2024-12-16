@@ -98,23 +98,55 @@ const loginUser  = async (req, res, next) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "90d",
     });  
-  
+    
+    // SET token in cookies 
+    res.cookie('token',token,{
+      expires:new Date(new Date() + (process.env.COOKIES_EXPIRE*24*60*60*1000)),
+     
+      // httpOnly:true,
+    })
 
 
     // Send response
     res.status(200).json({
       success: true,
-      message: "User  logged in successfully",
       token,
-      user: { id: user.userName, email: user.email } // Optionally include user info
+      message: "User  logged in successfully",
+      user: { id: user.userName, email: user.email,profilePhoto:user.profilePhoto } // Optionally include user info
     });
+
 
   } catch (err) {
     return next(err);
   }
 };
 
+const profileInfo= async(req,res,next)=>{
 
+  try {
+    // decode token and get id 
+     const reqToken =await req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(reqToken, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+    const user = await User.findById({_id:userId});
+    // check user exits or not
+    if(!user){
+      const err= new Error();
+      err.message = "User not found";
+      err.statusCode = 400;
+      return next(err);
+    }
+
+
+    res.status(200).json({
+      success:true,
+      user:user
+    })
+
+  } catch (error) {
+    return next(error);
+  }
+}
 
 // Utility function to create errors
 function createError(message, statusCode) {
@@ -123,4 +155,4 @@ function createError(message, statusCode) {
   return err;
 }
 
-export {createUser,loginUser}
+export {createUser,loginUser,profileInfo}
