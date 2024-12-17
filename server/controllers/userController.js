@@ -126,10 +126,8 @@ const profileInfo= async(req,res,next)=>{
 
   try {
     // decode token and get id 
-    const reqToken =await req.headers.authorization.split(" ")[1];
-    const decodedToken = jwt.verify(reqToken, process.env.JWT_SECRET);
-    const userId = decodedToken.userId;
-    const user = await User.findById({_id:userId});
+    
+    const user = await User.findById({_id:req.userId});
     // check user exits or not
     if(!user){
       const err= new Error();
@@ -166,17 +164,13 @@ const logout = async(req,res,next)=>{
 
 const deleteAccount = async(req,res,next)=>{
   try {
-    //  get token from header 
-    const reqToken = await req.headers.authorization.split(" ")[1];
-    const decodedToken = jwt.verify(reqToken, process.env.JWT_SECRET);
-    const userId = decodedToken.userId;
-    if(!userId){
+    if(!req.userId){
       const err= new Error();
       err.message = "User not found";
       err.statusCode = 400;
       return next(err);
     }
-  await  User.findByIdAndDelete(userId);
+  await  User.findByIdAndDelete(req.userId);
     res.status(200).json({
       success:true,
       message:"User deleted successfully"

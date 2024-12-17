@@ -14,9 +14,10 @@ const protect = async(req,res,next)=>{
     // decode the token
     const decoded = jwt.verify(token,process.env.JWT_SECRET);
     
-    const userId = decoded.userId;
-    const user = await User.findById(userId);
-
+    const userID= decoded.userId;
+    req.userId = userID;
+    const user = await User.findById(req.userId);
+    
     if(!user){
        const err = new Error();
        err.message = "User not found";
