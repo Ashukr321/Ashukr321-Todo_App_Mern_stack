@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import protect from "../middleware/protectRouteHandler.js"
-import { createUser,loginUser ,profileInfo ,logout} from "../controllers/userController.js";
+import { createUser,loginUser ,profileInfo ,logout,deleteAccount} from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -22,6 +22,7 @@ router.post('/register', upload.single('profilePhoto'),createUser);
 router.post('/login',loginUser);
 router.get('/profileInfo',protect,profileInfo);
 router.get('/logout',protect,logout);
+router.get('/deleteAccount',protect,deleteAccount);
 
 
 

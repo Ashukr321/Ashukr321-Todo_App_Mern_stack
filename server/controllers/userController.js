@@ -99,12 +99,12 @@ const loginUser  = async (req, res, next) => {
       expiresIn: "90d",
     });  
     
-    // SET token in cookies 
-    res.cookie('token',token,{
-      expires:new Date(new Date() + (process.env.COOKIES_EXPIRE*24*60*60*1000)),
+    // // SET token in cookies 
+    // res.cookie('token',token,{
+    //   expires:new Date(new Date() + (process.env.COOKIES_EXPIRE*24*60*60*1000)),
      
-      // httpOnly:true,
-    })
+    //   // httpOnly:true,
+    // })
 
 
     // Send response
@@ -121,11 +121,12 @@ const loginUser  = async (req, res, next) => {
   }
 };
 
+//  get user profile info
 const profileInfo= async(req,res,next)=>{
 
   try {
     // decode token and get id 
-     const reqToken =await req.headers.authorization.split(" ")[1];
+    const reqToken =await req.headers.authorization.split(" ")[1];
     const decodedToken = jwt.verify(reqToken, process.env.JWT_SECRET);
     const userId = decodedToken.userId;
     const user = await User.findById({_id:userId});
@@ -148,6 +149,8 @@ const profileInfo= async(req,res,next)=>{
   }
 }
 
+
+
 const logout = async(req,res,next)=>{
   try {
     res.clearCookie("token");
@@ -155,7 +158,30 @@ const logout = async(req,res,next)=>{
       success:true,
       message:"User logout successfully"
     })
-    res.redirect('/login');
+  } catch (error) {
+    return next(error);
+  }
+}
+
+
+const deleteAccount = async(req,res,next)=>{
+  try {
+    //  get token from header 
+    const reqToken = await req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(reqToken, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+    if(!userId){
+      const err= new Error();
+      err.message = "User not found";
+      err.statusCode = 400;
+      return next(err);
+    }
+  await  User.findByIdAndDelete(userId);
+    res.status(200).json({
+      success:true,
+      message:"User deleted successfully"
+    })
+
   } catch (error) {
     return next(error);
   }
@@ -169,4 +195,5 @@ function createError(message, statusCode) {
   return err;
 }
 
-export {createUser,loginUser,profileInfo,logout}
+
+export {createUser,loginUser,profileInfo,logout,deleteAccount}
