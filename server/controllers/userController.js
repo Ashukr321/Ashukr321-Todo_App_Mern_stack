@@ -4,7 +4,8 @@ import bcrypt from "bcrypt"
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 import configEnv from "../config/configEnv.js";
-
+import transporter from "../utils/mailer.js";
+import{welcomeMailOptions} from "../utils/mailOptions.js"
 
 // create user 
 const createUser = async(req,res,next)=>{
@@ -34,6 +35,7 @@ const createUser = async(req,res,next)=>{
       api_key: configEnv.cloudinary_api_key,
       api_secret: configEnv.cloudinary_api_secret,
     });
+
     const result = await cloudinary.uploader.upload(req.file.path);
     const profilePhoto = result.secure_url;
     // delete image from server
@@ -53,14 +55,20 @@ const createUser = async(req,res,next)=>{
       email,
       password:HashedPassword
     })
-
+    
     // create token 
     const token = jwt.sign({userId:newUser._id},configEnv.jwt_secret,{
       expiresIn:"90d"
     })
-
+    
+     // Send welcome mail
+    transporter.sendMail(welcomeMailOptions(email, userName));
     // save user 
     await newUser.save();
+    
+
+
+
     res.status(201).json({
       success:true,
       message:"User created successfully",
