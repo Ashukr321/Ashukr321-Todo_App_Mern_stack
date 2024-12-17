@@ -3,7 +3,9 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
-
+import configEnv from "../config/configEnv.js";
+import transporter from "../utils/mailer.js";
+import{welcomeMailOptions} from "../utils/mailOptions.js"
 
 // create user 
 const createUser = async(req,res,next)=>{
@@ -29,10 +31,11 @@ const createUser = async(req,res,next)=>{
 
     //  upload image to cloudinary
     cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
+      cloud_name: configEnv.cloudinary_cloud_name,
+      api_key: configEnv.cloudinary_api_key,
+      api_secret: configEnv.cloudinary_api_secret,
     });
+
     const result = await cloudinary.uploader.upload(req.file.path);
     const profilePhoto = result.secure_url;
     // delete image from server
@@ -52,14 +55,20 @@ const createUser = async(req,res,next)=>{
       email,
       password:HashedPassword
     })
-
+    
     // create token 
-    const token = jwt.sign({userId:newUser._id},process.env.JWT_SECRET,{
+    const token = jwt.sign({userId:newUser._id},configEnv.jwt_secret,{
       expiresIn:"90d"
     })
-
+    
+     // Send welcome mail
+    transporter.sendMail(welcomeMailOptions(email, userName));
     // save user 
     await newUser.save();
+    
+
+
+
     res.status(201).json({
       success:true,
       message:"User created successfully",
@@ -95,25 +104,91 @@ const loginUser  = async (req, res, next) => {
 
     
     // Create a new token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, configEnv.jwt_secret, {
       expiresIn: "90d",
     });  
-  
+    
+    // // SET token in cookies 
+    // res.cookie('token',token,{
+    //   expires:new Date(new Date() + (process.env.COOKIES_EXPIRE*24*60*60*1000)),
+     
+    //   // httpOnly:true,
+    // })
 
 
     // Send response
     res.status(200).json({
       success: true,
-      message: "User  logged in successfully",
       token,
-      user: { id: user.userName, email: user.email } // Optionally include user info
+      message: "User  logged in successfully",
+      user: { id: user.userName, email: user.email,profilePhoto:user.profilePhoto } // Optionally include user info
     });
+
 
   } catch (err) {
     return next(err);
   }
 };
 
+//  get user profile info
+const profileInfo= async(req,res,next)=>{
+
+  try {
+    // decode token and get id 
+    
+    const user = await User.findById({_id:req.userId});
+    // check user exits or not
+    if(!user){
+      const err= new Error();
+      err.message = "User not found";
+      err.statusCode = 400;
+      return next(err);
+    }
+
+
+    res.status(200).json({
+      success:true,
+      user:user
+    })
+
+  } catch (error) {
+    return next(error);
+  }
+}
+
+
+
+const logout = async(req,res,next)=>{
+  try {
+    res.clearCookie("token");
+    res.status(200).json({
+      success:true,
+      message:"User logout successfully"
+    })
+  } catch (error) {
+    return next(error);
+  }
+}
+
+//  delete Account
+const deleteAccount = async(req,res,next)=>{
+  try {
+    if(!req.userId){
+      const err= new Error();
+      err.message = "User not found";
+      err.statusCode = 400;
+      return next(err);
+    }
+  await  User.findByIdAndDelete(req.userId);
+    res.status(200).json({
+      success:true,
+      message:"User deleted successfully"
+    })
+
+  } catch (error) {
+    return next(error);
+  }
+}
 
 
 // Utility function to create errors
@@ -123,4 +198,5 @@ function createError(message, statusCode) {
   return err;
 }
 
-export {createUser,loginUser}
+
+export {createUser,loginUser,profileInfo,logout,deleteAccount}

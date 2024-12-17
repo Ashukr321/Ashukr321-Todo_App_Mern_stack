@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
-
-import { createUser,loginUser  } from "../controllers/userController.js";
+import protect from "../middleware/protectRouteHandler.js"
+import { createUser,loginUser ,profileInfo ,logout,deleteAccount} from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -20,5 +20,10 @@ const upload = multer({ storage: storage });
 // Route for user registration with file upload
 router.post('/register', upload.single('profilePhoto'),createUser);
 router.post('/login',loginUser);
+router.get('/profileInfo',protect,profileInfo);
+router.get('/logout',protect,logout);
+router.get('/deleteAccount',protect,deleteAccount);
+
+
 
 export default router;
