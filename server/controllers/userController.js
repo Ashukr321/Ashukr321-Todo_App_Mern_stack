@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
+import configEnv from "../config/configEnv.js";
 
 
 // create user 
@@ -29,9 +30,9 @@ const createUser = async(req,res,next)=>{
 
     //  upload image to cloudinary
     cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
+      cloud_name: configEnv.cloudinary_cloud_name,
+      api_key: configEnv.cloudinary_api_key,
+      api_secret: configEnv.cloudinary_api_secret,
     });
     const result = await cloudinary.uploader.upload(req.file.path);
     const profilePhoto = result.secure_url;
@@ -54,7 +55,7 @@ const createUser = async(req,res,next)=>{
     })
 
     // create token 
-    const token = jwt.sign({userId:newUser._id},process.env.JWT_SECRET,{
+    const token = jwt.sign({userId:newUser._id},configEnv.jwt_secret,{
       expiresIn:"90d"
     })
 
@@ -95,7 +96,7 @@ const loginUser  = async (req, res, next) => {
 
     
     // Create a new token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, configEnv.jwt_secret, {
       expiresIn: "90d",
     });  
     
@@ -161,7 +162,7 @@ const logout = async(req,res,next)=>{
   }
 }
 
-
+//  delete Account
 const deleteAccount = async(req,res,next)=>{
   try {
     if(!req.userId){

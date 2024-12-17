@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import User from '../models/userModel.js';
+import configEnv from '../config/configEnv.js';
 const protect = async(req,res,next)=>{
   try {
     // get token from header
@@ -12,7 +13,7 @@ const protect = async(req,res,next)=>{
     const token = req.headers.authorization.split(" ")[1];
     
     // decode the token
-    const decoded = jwt.verify(token,process.env.JWT_SECRET);
+    const decoded = jwt.verify(token,configEnv.jwt_secret);
     
     const userID= decoded.userId;
     req.userId = userID;
