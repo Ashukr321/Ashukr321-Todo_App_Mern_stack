@@ -10,7 +10,7 @@ import fs from 'fs';
 import configEnv from './config/configEnv.js';
 //  import routes 
 import userRoutes from './routes/userRoutes.js'
-
+import taskRoutes from './routes/taskRoutes.js'
 
 
 
@@ -52,7 +52,8 @@ app.use(async(req,res,next)=>{
 // Routes 
 //  useRoutes
 const base = "/api/v1"
-app.use(`${base}/user`,userRoutes)
+app.use(`${base}/user`,userRoutes);
+app.use(`${base}/task`,taskRoutes);
 
 //  error handling middleware
 app.use(globalErrorHandler);
