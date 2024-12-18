@@ -40,10 +40,34 @@ const getTasks = async(req,res,next)=>{
   }
 }
 
+
 // updateById
+const updateTask = async(req,res,next)=>{
+  try {
+    const {title,description,status} = req.body;
+    const {productId} = req.params;
+    const task = await Task.findById(productId);
+    if(!task){
+      throw new Error("Task not found");
+    }
+    // update 
+    task.title = title;
+    task.description = description;
+    task.status = status;
+    await task.save();
+    res.status(200).json({
+      success:true,
+      message:"Task updated successfully",
+    })
+    
+  } catch (error) {
+    return next(error);
+  }
+}
 // deleteById
 
 export {
   createTask,
-  getTasks
+  getTasks,
+  updateTask
 }
