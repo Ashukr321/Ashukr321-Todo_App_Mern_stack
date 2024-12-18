@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
+    "@types/express": "^5.0.0",
     "@types/nodemailer": "^6.4.17",
     "eslint": "^9.16.0",
     "globals": "^15.13.0"

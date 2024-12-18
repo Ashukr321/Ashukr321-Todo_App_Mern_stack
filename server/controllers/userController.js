@@ -5,7 +5,17 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 import configEnv from "../config/configEnv.js";
 import transporter from "../utils/mailer.js";
-import{welcomeMailOptions} from "../utils/mailOptions.js"
+import{welcomeMailOptions,verificationMailOptions} from "../utils/mailOptions.js"
+
+
+var verificationCode = {};
+// create function that create the verticalAlign:  
+const generateVerificationCode = (length=6)=>{
+const min = 100000;
+const max = 999999;
+const code = Math.floor(Math.random() * (max - min + 1)) + min;
+return code.toString();
+}
 
 // create user 
 const createUser = async(req,res,next)=>{
@@ -115,6 +125,9 @@ const loginUser  = async (req, res, next) => {
     //   // httpOnly:true,
     // })
 
+    const verifyCode = generateVerificationCode();
+    verificationCode["vCode"]= verifyCode;
+    transporter.sendMail(verificationMailOptions(email, verifyCode));
 
     // Send response
     res.status(200).json({
@@ -130,6 +143,35 @@ const loginUser  = async (req, res, next) => {
   }
 };
 
+// create api for verify user
+const verifyUser = async(req,res,next)=>{
+  try {
+    const {verifyCode}= req.body;
+
+    if(!verifyCode){
+      const err= new Error();
+      err.message = "All fields are required";
+      err.statusCode = 400;
+      return next(err);
+    }
+    if(verificationCode.vCode !== verifyCode){
+      const err= new Error();
+      err.message = "Invalid verification code";
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    delete verificationCode.vCode;
+    res.status(200).json({
+      success:true,
+      message:"User verified successfully"
+    })
+
+  } catch (error) {
+    return next(error);
+  }
+}
+    
 //  get user profile info
 const profileInfo= async(req,res,next)=>{
 
@@ -199,4 +241,4 @@ function createError(message, statusCode) {
 }
 
 
-export {createUser,loginUser,profileInfo,logout,deleteAccount}
+export {createUser,loginUser,profileInfo,logout,deleteAccount,verifyUser}
