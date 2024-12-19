@@ -23,7 +23,16 @@ const userSchema = new mongoose.Schema({
     required: [true, "Password is required."],
     minlength: [8, "Password must be at least 8 characters."],
     
-  }
+  },
+  otp:{
+    type:String,
+    default:"0"
+  },
+  optExpired:{
+    type:String,
+    default:Date
+  },
+
 }, { timestamps: true }); // Add timestamps for createdAt and updatedAt
 
 // Create and export userModel 

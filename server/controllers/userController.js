@@ -8,7 +8,6 @@ import transporter from "../utils/mailer.js";
 import{welcomeMailOptions,verificationMailOptions} from "../utils/mailOptions.js"
 
 
-var verificationCode = {};
 // create function that create the verticalAlign:  
 const generateVerificationCode = (length=6)=>{
 const min = 100000;
@@ -118,26 +117,24 @@ const loginUser  = async (req, res, next) => {
       expiresIn: "90d",
     });  
     
-    // // SET token in cookies 
-    // res.cookie('token',token,{
-    //   expires:new Date(new Date() + (process.env.COOKIES_EXPIRE*24*60*60*1000)),
-     
-    //   // httpOnly:true,
-    // })
-
     const verifyCode = generateVerificationCode();
-    verificationCode["vCode"]= verifyCode;
-    transporter.sendMail(verificationMailOptions(email, verifyCode));
-
-    // Send response
-    res.status(200).json({
-      success: true,
-      token,
-      message: "User  logged in successfully",
-      user: { id: user.userName, email: user.email,profilePhoto:user.profilePhoto } // Optionally include user info
+    user.otp= verifyCode;
+    user.optExpired=Date.now() + 1000*60*5;
+    transporter.sendMail(verificationMailOptions(email, verifyCode),(err,info)=>{
+      if(err){
+        const err = new Error();
+        err.message = "Error sending email";
+        err.statusCode = 500;
+        return next(err);
+      }else{
+        res.status(200).json({
+          success: true,
+          token,
+          message: "otp sent to your email",
+        });
+      }
     });
-
-
+    await user.save();
   } catch (err) {
     return next(err);
   }
@@ -145,28 +142,33 @@ const loginUser  = async (req, res, next) => {
 
 // create api for verify user
 const verifyUser = async(req,res,next)=>{
+
   try {
     const {verifyCode}= req.body;
-
+    const user = await User.findOne(req.userId);
     if(!verifyCode){
       const err= new Error();
       err.message = "All fields are required";
       err.statusCode = 400;
       return next(err);
     }
-    if(verificationCode.vCode !== verifyCode){
+
+    if(user.otp !== verifyCode){
       const err= new Error();
       err.message = "Invalid verification code";
       err.statusCode = 400;
       return next(err);
     }
 
-    delete verificationCode.vCode;
+    user.otp = null;
+    user.optExpired=null;
+    await user.save();
+
     res.status(200).json({
       success:true,
-      message:"User verified successfully"
+      message:"you are login successfully",
     })
-
+    
   } catch (error) {
     return next(error);
   }
