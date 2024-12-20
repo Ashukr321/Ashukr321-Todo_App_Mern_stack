@@ -39,4 +39,31 @@ const verificationMailOptions = (email,verificationCode)=>{
   }
 }
 
-export   { welcomeMailOptions,verificationMailOptions }
+const  resetPasswordMailOptions= (email,url)=>{
+  return {
+    from: `${configEnv.smtp_email}`,
+    to: email,
+    subject: 'forget password reset',
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+      <p style="color: #555;">You are receiving this email because you (or someone else) have requested the reset of the password for your account.</p>
+      <p style="color: #555;">Please click on the following link, or paste this into your browser to complete the process:</p>
+      <p style="color: #555;">${url}</p>
+    `
+  }
+}
+
+const passwordResetConfirmationMailOptions = (email,userName)=>{
+  return {
+    from: `${configEnv.smtp_email}`,
+    to: email,
+    subject: 'Password reset confirmation',
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+      <p style="color: #555;">${userName} password has been successfully reset.</p>
+      <p style="color: #555;">If you did not request a password reset, please contact our support team immediately.</p>
+      <p style="color: #555;">Best regards,<br>Your Company Name</p>
+    `
+  }
+}
+export   { welcomeMailOptions,verificationMailOptions ,resetPasswordMailOptions,passwordResetConfirmationMailOptions}

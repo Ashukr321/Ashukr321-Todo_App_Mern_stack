@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import protect from "../middleware/protectRouteHandler.js"
-import { createUser,loginUser ,profileInfo ,logout,deleteAccount,verifyUser} from "../controllers/userController.js";
+import { createUser,loginUser ,profileInfo ,logout,deleteAccount,verifyUser,resetpassword,forgetpassword} from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -23,6 +23,10 @@ router.post('/login',loginUser);
 router.post('/verifyUser',verifyUser);
 router.get('/profileInfo',protect,profileInfo);
 router.get('/logout',protect,logout);
+
+router.post('/forgetpassword',protect,forgetpassword);
+router.post('/resetpassword/:token',protect,resetpassword);
+
 router.get('/deleteAccount',protect,deleteAccount);
 
 
