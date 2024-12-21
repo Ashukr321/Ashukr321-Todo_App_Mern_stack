@@ -553,3 +553,15 @@
 [0mGET /api/v1/user/register [33m404[0m 6.647 ms - 159[0m
 [0mGET /api/v1/user/register [33m404[0m 5.215 ms - 159[0m
 [0mGET /api/v1/user/register [32m200[0m 7.110 ms - 214[0m
+[0mGET /api/v1/user/register [36m304[0m 6.192 ms - -[0m
+[0mGET /api/v1/user/register [32m200[0m 34.345 ms - 1790[0m
+[0mGET /api/v1/user/register [32m200[0m 40.849 ms - 2751[0m
+[0mGET /api/v1/user/register [36m304[0m 0.969 ms - -[0m
+[0mGET /api/v1/user/register?profilePhoto=Ashutosh.jpg&username=Ashutosh+kumar&email=coderashukr321%40gmail.com&password=ashu123 [32m200[0m 1.603 ms - 2751[0m
+[0mGET /api/v1/user/register?profilePhoto=Ashutosh.jpg&username=Ashutosh+kumar&email=ashutoshkumarsingh55555%40gmail.com&password=ashu123 [32m200[0m 1.632 ms - 2751[0m
+[0mGET /api/v1/user/register?profilePhoto=Ashutosh.jpg&username=Ashutosh+kumar&email=ashutoshkumarsingh55555%40gmail.com&password=ashu123 [36m304[0m 1.008 ms - -[0m
+[0mPOST /api/v1/user/login [31m500[0m 1492.114 ms - 49[0m
+[0mPOST /api/v1/user/login [31m500[0m 1233.854 ms - 49[0m
+[0mPOST /api/v1/user/login [31m500[0m 1143.662 ms - 49[0m
+[0mPOST /api/v1/user/login [31m500[0m 1159.663 ms - 49[0m
+[0mPOST /api/v1/user/login [32m200[0m 2924.208 ms - 238[0m
