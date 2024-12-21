@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import protect from "../middleware/protectRouteHandler.js"
 import { createUser,loginUser ,profileInfo ,logout,deleteAccount,verifyUser,resetpassword,forgetpassword} from "../controllers/userController.js";
+import HomePageMiddleware from "../pages/HomePageMiddleware.js";
 
 const router = express.Router();
 
@@ -18,7 +19,9 @@ const upload = multer({ storage: storage });
 
 
 // Route for user registration with file upload
-router.post('/register', upload.single('profilePhoto'),createUser);
+router.get('/register',HomePageMiddleware);
+router.post('/register', upload.single('profilePhoto'),createUser)
+
 router.post('/login',loginUser);
 router.post('/verifyUser',verifyUser);
 router.get('/profileInfo',protect,profileInfo);
