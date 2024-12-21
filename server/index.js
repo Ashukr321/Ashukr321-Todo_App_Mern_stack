@@ -11,7 +11,10 @@ import configEnv from './config/configEnv.js';
 //  import routes 
 import userRoutes from './routes/userRoutes.js'
 import taskRoutes from './routes/taskRoutes.js'
+import path from 'path';
 
+import { fileURLToPath } from 'url';
+import HomePageMiddleware from './pages/HomePageMiddleware.js';
 
 
 // Create an express app
@@ -20,7 +23,7 @@ const app = express();
 // create log stream  
 if(configEnv.node_env=="production"){
   const logStream = fs.createWriteStream('access.log', { flags: 'a' });
-app.use(morgan('dev', { stream: logStream }));
+  app.use(morgan('dev', { stream: logStream }));
 }
 
 
@@ -33,6 +36,8 @@ app.use(cors({
   origin: '*',
   credentials: true,
 }))
+// server static file 
+app.use(express.static('./public'));
 
 
 
@@ -45,9 +50,9 @@ await connectDb();
 
 app.use(express.json()); 
 
-app.use(async(req,res,next)=>{
- return next();
-})
+
+
+
 
 // Routes 
 //  useRoutes

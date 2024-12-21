@@ -8,4 +8,4 @@ const rateLimiter = rateLimit ({
     legacyHeaders: false,
 })
 
-export default rateLimiter;
+export default rateLimiter
